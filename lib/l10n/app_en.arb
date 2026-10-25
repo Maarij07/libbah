@@ -1,0 +1,64 @@
+{
+  "@@locale": "en",
+  "homeCallButton": "CALL",
+  "homeSosButton": "SOS\nEMERGENCY",
+  "contactsTitleCall": "Call a Contact",
+  "contactsTitleMessage": "Message a Contact",
+  "contactsTitleManage": "Contacts",
+  "contactsTitleChooseEmergency": "Choose emergency contact",
+  "contactsAccessNeededTitle": "Contacts access needed",
+  "contactsAccessNeededMessage": "Press the green Call button to grant access to your contacts.",
+  "contactsErrorTitle": "Something went wrong",
+  "contactsErrorMessage": "Press the green Call button to try again.",
+  "contactsEmptyTitle": "No contacts found",
+  "contactsEmptyMessage": "This device has no saved contacts yet.",
+  "contactDetailNoPhone": "No phone number on file",
+  "contactDetailHint": "Press the green Call button to call the highlighted number.",
+  "sosTitle": "Emergency SOS",
+  "sosNoContactsHint": "Add at least one emergency contact to enable SOS.",
+  "sosCallsAndTextsHint": "Calls {name} and texts everyone below.",
+  "@sosCallsAndTextsHint": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sosCallName": "Call {name}",
+  "@sosCallName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sosAddContact": "Add emergency contact",
+  "sosContactsHeading": "Emergency contacts",
+  "sosNoContactsYet": "No emergency contacts yet.",
+  "sosButtonLabel": "SOS",
+  "sosMessage": "SOS! I need help. This is an emergency, please call me.",
+  "caseCall": "Call",
+  "caseHome": "Home",
+  "caseHangup": "Hang up",
+  "casePrevious": "Previous contact",
+  "caseSos": "SOS",
+  "caseNext": "Next contact",
+  "callIncoming": "Incoming call",
+  "callDialing": "Calling…",
+  "callUnknownCaller": "Unknown caller",
+  "callAnswerHint": "Green button to answer, red button to decline.",
+  "callEndHint": "Red button to end the call.",
+  "missedTitle": "Missed Calls",
+  "missedEmptyTitle": "No missed calls",
+  "missedEmptyMessage": "Nobody has called while you were away.",
+  "missedCount": "{count, plural, =1{1 missed call} other{{count} missed calls}}",
+  "@missedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "callUnknownNumber": "Unknown number",
+  "callSpeakerOn": "Speaker on"
+}

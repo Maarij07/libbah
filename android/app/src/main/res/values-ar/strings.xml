@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="quick_switch_service_description">يتيح لتطبيق Labbiah اكتشاف الضغط المطوّل على زر رفع الصوت لمدة 12 ثانية للعودة إلى Labbiah من أي مكان في الهاتف، ويُبقي زرَّي إنهاء المكالمة والاتصال في Labbiah ظاهرَين أثناء المكالمات. لا يقرأ محتوى الشاشة ولا يغيّر أي تطبيق أو إعداد آخر.</string>
+    <string name="quick_switch_disclosure_title">السماح بالتبديل السريع في Labbiah؟</string>
+    <string name="quick_switch_disclosure_message">يستخدم Labbiah خدمة إمكانية الوصول في أندرويد لاكتشاف الضغط المطوّل على زر رفع الصوت لمدة 12 ثانية، حتى يتمكن مستخدم هذا الهاتف من العودة إلى شاشة Labbiah المبسّطة من أي مكان وفي أي وقت. (للخروج من Labbiah، اضغط مطولًا على زر الصفحة الرئيسية فيه وزر رفع الصوت معًا لمدة 5 ثوانٍ.)\n\nكما تُبقي الخدمة زرَّي إنهاء المكالمة والاتصال في Labbiah ظاهرَين فوق شاشة المكالمة في الهاتف، حتى يمكن الرد على المكالمات وإنهاؤها بأزرار الغطاء.\n\nالزر الوحيد الذي تستمع إليه الخدمة هو زر رفع الصوت. لا تقرأ محتوى الشاشة، ولا تجمع أو تشارك أي بيانات شخصية، ولا تغيّر أي تطبيق أو إعداد آخر.\n\nعند الموافقة ستُفتح إعدادات إمكانية الوصول. ابحث عن \"Labbiah Quick Switch\" وقم بتفعيله.</string>
+    <string name="quick_switch_disclosure_accept">موافق</string>
+    <string name="quick_switch_disclosure_decline">لا، شكرًا</string>
+    <string name="default_launcher_title">جعل Labbiah الشاشة الرئيسية؟</string>
+    <string name="default_launcher_message">عند تعيين Labbiah كتطبيق الشاشة الرئيسية الافتراضي، سيظهر دائمًا أولًا، بما في ذلك بعد إعادة تشغيل الهاتف أو الضغط على زر الصفحة الرئيسية.\n\nفي الشاشة التالية، اختر \"labbiah\" وأكّد تعيينه كافتراضي.</string>
+    <string name="default_launcher_accept">تعيين كافتراضي</string>
+    <string name="default_launcher_decline">ليس الآن</string>
+    <string name="case_hangup">إنهاء المكالمة</string>
+    <string name="case_call">اتصال</string>
+</resources>

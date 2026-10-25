@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="app_background">#F5EEE3</color>
+    <!-- App icon background from the final approved brand assets. -->
+    <color name="ic_launcher_background">#FBF5EA</color>
+</resources>

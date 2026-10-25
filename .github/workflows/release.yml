@@ -1,0 +1,142 @@
+name: Release
+
+# push to main     -> signed AAB to the Play "internal" track
+# tag vX.Y.Z       -> signed AAB to the Play "alpha" (closed testing) track
+# Promotion to production is done by promote.yml, never automatically.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      track:
+        description: Play track to upload to
+        type: choice
+        options: [internal, alpha]
+        default: internal
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: "3.44.4"
+  PACKAGE_NAME: com.labbiah.app
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: play-testing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter gen-l10n
+
+      # Same gates as CI: nothing reaches Play without passing them.
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test
+
+      - name: Resolve version and track
+        id: meta
+        run: |
+          # versionCode must strictly increase on Play. Offset past the
+          # manually uploaded first build; run_attempt keeps re-runs unique.
+          BUILD_NUMBER=$(( 1000 + GITHUB_RUN_NUMBER * 10 + GITHUB_RUN_ATTEMPT ))
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            BUILD_NAME="${GITHUB_REF_NAME#v}"
+            TRACK=alpha
+          else
+            BUILD_NAME=$(grep '^version:' pubspec.yaml | sed -E 's/version: *([^+]+).*/\1/')
+            TRACK="${{ inputs.track || 'internal' }}"
+          fi
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "build_name=$BUILD_NAME" >> "$GITHUB_OUTPUT"
+          echo "track=$TRACK" >> "$GITHUB_OUTPUT"
+          echo "### $BUILD_NAME ($BUILD_NUMBER) → $TRACK" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Restore upload keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload-keystore.jks"
+          cat > android/key.properties <<PROPS
+          storeFile=$RUNNER_TEMP/upload-keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          PROPS
+
+      - name: Build signed app bundle
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.meta.outputs.build_name }} \
+            --build-number=${{ steps.meta.outputs.build_number }} \
+            --obfuscate --split-debug-info=build/symbols
+
+      - name: Verify bundle is not debug-signed
+        run: |
+          AAB=build/app/outputs/bundle/release/app-release.aab
+          if keytool -printcert -jarfile "$AAB" | grep -q "CN=Android Debug"; then
+            echo "::error::Bundle is signed with the debug key"; exit 1
+          fi
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ env.PACKAGE_NAME }}
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: ${{ steps.meta.outputs.track }}
+          # "draft" until the app passes its first Play review, then
+          # "completed". Set via the PLAY_RELEASE_STATUS repo variable.
+          status: ${{ vars.PLAY_RELEASE_STATUS || 'draft' }}
+          mappingFile: build/app/outputs/mapping/release/mapping.txt
+          whatsNewDirectory: distribution/whatsnew
+
+      # Dart obfuscation symbols are needed to read crash stack traces.
+      # Keep them with the build; on tags, attach to a GitHub Release so
+      # they outlive artifact retention.
+      - name: Archive bundle and symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: labbiah-${{ steps.meta.outputs.build_name }}-${{ steps.meta.outputs.build_number }}
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/mapping/release/mapping.txt
+            build/symbols
+          retention-days: 90
+
+      - name: GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf "symbols-${GITHUB_REF_NAME}.tar.gz" -C build symbols
+          gh release create "$GITHUB_REF_NAME" \
+            build/app/outputs/bundle/release/app-release.aab \
+            build/app/outputs/mapping/release/mapping.txt \
+            "symbols-${GITHUB_REF_NAME}.tar.gz" \
+            --title "$GITHUB_REF_NAME" --generate-notes
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f android/key.properties "$RUNNER_TEMP/upload-keystore.jks"

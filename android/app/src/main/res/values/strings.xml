@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="quick_switch_service_description">Lets Labbiah detect a 12-second Volume Up hold so you can return to Labbiah from anywhere on the phone, and keeps Labbiah\'s Hang-up and Call buttons on screen during phone calls. It does not read screen content and does not change any other app or setting.</string>
+    <string name="quick_switch_disclosure_title">Allow Labbiah Quick Switch?</string>
+    <string name="quick_switch_disclosure_message">Labbiah uses Android\'s Accessibility service to detect a 12-second hold of the Volume Up button, so the person using this phone can return to Labbiah\'s simplified screen from anywhere at any time. (To leave Labbiah, hold its Home key and Volume Up together for 5 seconds.)\n\nIt also keeps Labbiah\'s Hang-up and Call buttons on screen over the phone\'s call screen, so calls can be answered and ended with the case buttons.\n\nThe only button it listens for is Volume Up. It does not read what is on the screen, collect or share any personal data, or change any other app or setting.\n\nIf you agree, Android\'s Accessibility settings will open. Find \"Labbiah Quick Switch\" there and turn it on.</string>
+    <string name="quick_switch_disclosure_accept">Agree</string>
+    <string name="quick_switch_disclosure_decline">No thanks</string>
+    <string name="default_launcher_title">Make Labbiah the home screen?</string>
+    <string name="default_launcher_message">Setting Labbiah as the default home app means it is always the first thing shown, including after the phone restarts or the Home button is pressed.\n\nOn the next screen, choose \"labbiah\" and confirm it as the default.</string>
+    <string name="default_launcher_accept">Set as default</string>
+    <string name="default_launcher_decline">Not now</string>
+    <string name="case_hangup">Hang up</string>
+    <string name="case_call">Call</string>
+</resources>

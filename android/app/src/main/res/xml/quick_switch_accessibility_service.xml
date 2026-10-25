@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Config for QuickSwitchAccessibilityService.
+
+  canRequestFilterKeyEvents is the one thing this service needs: it's the
+  only public Android mechanism that lets an app see hardware key events
+  (Volume only — never Home or Power) while a different app is in the
+  foreground. Real hardware-remap apps (e.g. "Button Mapper") rely on the
+  exact same mechanism.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:canRequestFilterKeyEvents="true"
+    android:isAccessibilityTool="true"
+    android:notificationTimeout="100"
+    android:description="@string/quick_switch_service_description" />

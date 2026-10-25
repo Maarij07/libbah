@@ -1,0 +1,61 @@
+name: Promote to production
+
+# Manual only. Moves the latest release on a testing track to production
+# with a staged rollout. Gated by the "production" environment, which
+# should require a reviewer's approval.
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_track:
+        description: Track to promote from
+        type: choice
+        options: [alpha, internal]
+        default: alpha
+      rollout:
+        description: Staged rollout fraction (0.01–1.0)
+        type: string
+        default: "0.1"
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - run: gem install fastlane --no-document
+
+      - name: Validate rollout
+        env:
+          ROLLOUT: ${{ inputs.rollout }}
+        run: |
+          awk -v r="$ROLLOUT" 'BEGIN { exit !(r > 0 && r <= 1) }' \
+            || { echo "::error::rollout must be in (0, 1]"; exit 1; }
+
+      - name: Promote
+        env:
+          PLAY_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          ROLLOUT: ${{ inputs.rollout }}
+        run: |
+          echo "$PLAY_JSON" > "$RUNNER_TEMP/play.json"
+          # A full rollout must be "completed"; Play rejects inProgress at 1.0.
+          if awk -v r="$ROLLOUT" 'BEGIN { exit !(r >= 1) }'; then
+            STAGE="track_promote_release_status:completed"
+          else
+            STAGE="track_promote_release_status:inProgress rollout:$ROLLOUT"
+          fi
+          fastlane run supply \
+            package_name:com.labbiah.app \
+            json_key:"$RUNNER_TEMP/play.json" \
+            track:${{ inputs.from_track }} \
+            track_promote_to:production \
+            $STAGE \
+            skip_upload_apk:true skip_upload_aab:true \
+            skip_upload_metadata:true skip_upload_changelogs:true \
+            skip_upload_images:true skip_upload_screenshots:true
+          rm -f "$RUNNER_TEMP/play.json"
+          echo "### Promoted ${{ inputs.from_track }} → production at $ROLLOUT" >> "$GITHUB_STEP_SUMMARY"
